@@ -1,4 +1,4 @@
-import 'package:contacts/ui/views/add_contacts.dart';
+import 'package:contacts/ui/views/contacts_list.dart';
 import 'package:flutter/material.dart';
 
 void main() => runApp(MyApp());
@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
        
         primarySwatch: Colors.blue,
       ),
-      home: AddContactsPage(),
+      home: ContactsList(),
     );
   }
 }
