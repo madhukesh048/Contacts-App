@@ -1,5 +1,9 @@
+import 'dart:io';
+import 'package:contacts/models/contact_model.dart';
+import 'package:contacts/services/hasura_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 
 class AddContactsPage extends StatefulWidget {
   @override
@@ -8,11 +12,23 @@ class AddContactsPage extends StatefulWidget {
 
 class _AddContactsPageState extends State<AddContactsPage> {
   var _formKey = GlobalKey<FormState>();
-  String _name;
-  String _phoneNumber;
-  String _waNumber;
-  String _email;
-  String _address;
+  ContactModel contactModel;
+
+  @override
+  void initState() {
+    super.initState();
+    contactModel = ContactModel();
+  }
+
+  File _image;
+
+  Future getImage() async {
+    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
+
+    setState(() {
+      _image = image;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,8 +41,10 @@ class _AddContactsPageState extends State<AddContactsPage> {
         child: FlatButton(
           color: Colors.blue,
           onPressed: () {
+            HasuraService().saveContact(contactModel);
             _formKey.currentState.save();
-            print("Name:$_name,PhoneNumber:$_phoneNumber,WANumber:$_waNumber,Email:$_email,Address:$_address");
+            print(
+                "Name:${contactModel.name},PhoneNumber:${contactModel.mobileNumber},WANumber:${contactModel.waNumber},Email:${contactModel.email},Address:${contactModel.address}");
           },
           child: Text(
             "Save",
@@ -40,9 +58,35 @@ class _AddContactsPageState extends State<AddContactsPage> {
           key: _formKey,
           child: ListView(
             children: <Widget>[
+              Center(
+                child: GestureDetector(
+                  onTap: () {
+                    getImage();
+                  },
+                  child: _image != null
+                      ? Container(
+                          width: 90.0,
+                          height: 90.0,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.black,
+                            image: DecorationImage(
+                                image: FileImage(_image), fit: BoxFit.fill),
+                          ),
+                        )
+                      : Container(
+                          width: 90.0,
+                          height: 90.0,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.black,
+                          ),
+                        ),
+                ),
+              ),
               TextFormField(
                 onSaved: (val) {
-                  _name = val;
+                  contactModel.name = val;
                 },
                 keyboardType: TextInputType.text,
                 decoration: InputDecoration(
@@ -53,7 +97,7 @@ class _AddContactsPageState extends State<AddContactsPage> {
               ),
               TextFormField(
                 onSaved: (val) {
-                  _phoneNumber = val;
+                  contactModel.mobileNumber = val;
                 },
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
@@ -63,7 +107,7 @@ class _AddContactsPageState extends State<AddContactsPage> {
               ),
               TextFormField(
                 onSaved: (val) {
-                  _waNumber = val;
+                  contactModel.waNumber = val;
                 },
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
@@ -73,7 +117,7 @@ class _AddContactsPageState extends State<AddContactsPage> {
               ),
               TextFormField(
                 onSaved: (val) {
-                  _email = val;
+                  contactModel.email = val;
                 },
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
@@ -83,7 +127,7 @@ class _AddContactsPageState extends State<AddContactsPage> {
               ),
               TextFormField(
                 onSaved: (val) {
-                  _address = val;
+                  contactModel.address = val;
                 },
                 keyboardType: TextInputType.text,
                 decoration: InputDecoration(
