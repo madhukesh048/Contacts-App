@@ -41,8 +41,13 @@ class _AddContactsPageState extends State<AddContactsPage> {
         child: FlatButton(
           color: Colors.blue,
           onPressed: () {
-            HasuraService().saveContact(contactModel);
             _formKey.currentState.save();
+            HasuraService().saveContact(contactModel).then((contact){
+             if(contact == null){
+               print("error");
+             } 
+            });
+            Navigator.pop(context);
             print(
                 "Name:${contactModel.name},PhoneNumber:${contactModel.mobileNumber},WANumber:${contactModel.waNumber},Email:${contactModel.email},Address:${contactModel.address}");
           },

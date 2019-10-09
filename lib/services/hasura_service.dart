@@ -7,7 +7,7 @@ class HasuraService {
 
   HasuraService() : this.hasuraConnect = HasuraConnect(url);
 
-  Future saveContact(ContactModel contactModel) async {
+  Future<ContactModel> saveContact(ContactModel contactModel) async {
     String query = """
   mutation {
   insert_contacts_list(objects: {email: "${contactModel.email}", name: "${contactModel.name}", mobile_number: "${contactModel.mobileNumber}", wa_number: "${contactModel.waNumber}"}) {
@@ -21,10 +21,24 @@ class HasuraService {
   }
 }
     """;
-
+    print(query);
     var result = await hasuraConnect.mutation(query);
     Map<String, dynamic> resultMap = Map.castFrom(result);
-    
+    if (resultMap.containsKey("data")) {
+      Map<String, dynamic> dataList = Map.castFrom(resultMap["data"]);
+      if (dataList.containsKey("insert_contacts_list")) {
+        Map<String, dynamic> contactList =
+            Map.castFrom(dataList["insert_contacts_list"]);
+        if (contactList.containsKey("returning")) {
+          List<Map<String, dynamic>> finalList =
+              List.castFrom(contactList["returning"]);
+          Map<String, dynamic> contactMap = finalList.elementAt(0);
+          ContactModel contactModel = ContactModel.fromJson(contactMap);
+          return contactModel;
+        }
+      }
+    }
+    return null;
 
     /*
       {
